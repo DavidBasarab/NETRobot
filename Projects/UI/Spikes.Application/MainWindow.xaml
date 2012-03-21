@@ -4,7 +4,7 @@
         Height="350" 
         Width="525"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-        >
+        xmlns:views="clr-namespace:Spikes.Application">
     <Window.Resources>
         <ResourceDictionary>
             <BooleanToVisibilityConverter x:Key="boolToVis" />
@@ -14,35 +14,42 @@
     <Window.DataContext>
         <Binding Source="{StaticResource Locator}" Path="MainView" />
     </Window.DataContext>
-    <StackPanel>
-        <TextBlock Text="{Binding SampleName}" />
-        <ItemsControl ItemsSource="{Binding ChessPieces}" Height="500" Width="500">
+    <DockPanel>
+        <TextBlock DockPanel.Dock="Top" Text="{Binding SampleName}" Margin="10" />
+        <Button DockPanel.Dock="Top" Content="Start Simulation" Command="{Binding StartSim}" Margin="50 10 50 10" />
+        <!--<StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <TextBlock Text="First Left:" Margin="0 0 10 0" />
+            <TextBlock Text="{Binding FirstLeft}" Margin="0 0 10 0" />
+            <TextBlock Text="First Top:" Margin="0 0 10 0" />
+            <TextBlock Text="{Binding FirstTop}" Margin="0 0 10 0" />
+            <TextBlock Text="Second Left:" Margin="0 0 10 0" />
+            <TextBlock Text="{Binding SecondLeft}" Margin="0 0 10 0" />
+            <TextBlock Text="Second Top:" Margin="0 0 10 0" />
+            <TextBlock Text="{Binding SecondTop}" />
+        </StackPanel>-->
+        <ItemsControl ItemsSource="{Binding Bots}" Height="500" Width="500">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <Grid ShowGridLines="True">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <!-- 7 more rows -->
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <!-- 7 more columns -->
-                        </Grid.ColumnDefinitions>
-                    </Grid>
+                    <Canvas />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Label Content="{Binding Text}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
             <ItemsControl.ItemContainerStyle>
-                <Style>
-                    <Setter Property="Grid.Row" Value="{Binding Row}"/>
-                    <Setter Property="Grid.Column" Value="{Binding Column}"/>
+                <Style TargetType="ContentPresenter">
+                    <Setter Property="Canvas.Left" Value="{Binding Path=Left}" />
+                    <Setter Property="Canvas.Top" Value="{Binding Path=Top}" />
                 </Style>
             </ItemsControl.ItemContainerStyle>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="Left:" Margin="0 0 10 0" />
+                        <TextBlock Text="{Binding Left}" Margin="0 0 10 0" />
+                        <TextBlock Text="Top:" Margin="0 0 10 0" />
+                        <TextBlock Text="{Binding Top}" />
+                        <views:SpikeBot DataContext="{Binding}"   />
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
         </ItemsControl>
-
-    </StackPanel>
+    </DockPanel>
 </Window>

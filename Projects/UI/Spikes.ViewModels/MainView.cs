@@ -1,21 +1,38 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
+using System.Windows.Input;
+using System.Windows.Media;
+using GalaSoft.MvvmLight.Command;
 using NETRobots.UI.Common;
-using Spikes.ViewModels.Models;
+using Spikes.ViewModels.Views;
 
 namespace Spikes.ViewModels
 {
     // Spiking this idea
     // http://wpf.2000things.com/2011/12/21/455-using-itemcontainerstyle-to-bind-data-elements-in-a-collection-to-a-grid/
+    // Grid did not work trying Canvas
+    // http://www.wpftutorial.net/Canvas.html
 
     public class MainView : BaseViewModel
     {
-        private ObservableCollection<ChessPiece> _chessPieces;
+        private ObservableCollection<SpikeBot> _bots;
+        private int _firstLeft;
+        private int _firstTop;
         private string _sampleName;
+        private int _secondLeft;
+        private int _secondTop;
 
         public MainView()
         {
             BuildSampleData();
+        }
+
+        public ObservableCollection<SpikeBot> Bots
+        {
+            get { return _bots; }
+            set { SetPropertyValue(ref _bots, value); }
         }
 
         public string SampleName
@@ -24,44 +41,72 @@ namespace Spikes.ViewModels
             set { SetPropertyValue(ref _sampleName, value); }
         }
 
-        public ObservableCollection<ChessPiece> ChessPieces
+        public int FirstLeft
         {
-            get { return _chessPieces; }
-            set { SetPropertyValue(ref _chessPieces, value); }
+            get { return _firstLeft; }
+            set { SetStructPropertyValue(ref _firstLeft, value); }
         }
 
-        protected override void RegisterForMessages() {}
+        public int SecondLeft
+        {
+            get { return _secondLeft; }
+            set { SetStructPropertyValue(ref _secondLeft, value); }
+        }
+
+        public int FirstTop
+        {
+            get { return _firstTop; }
+            set { SetStructPropertyValue(ref _firstTop, value); }
+        }
+
+        public int SecondTop
+        {
+            get { return _secondTop; }
+            set { SetStructPropertyValue(ref _secondTop, value); }
+        }
+
+        public ICommand StartSim { get; set; }
+
+        protected override void RegisterForMessages()
+        {
+            StartSim = new RelayCommand(OnStartSim);
+        }
 
         protected override void SetDesignTimeInfo()
         {
-            BuildSampleData();
+            SampleName = "Design TIME!!!";
+
+            FirstLeft = 75;
+            FirstTop = 120;
+
+            SecondLeft = 10;
+            SecondTop = 8;
         }
 
         private void BuildSampleData()
         {
             SampleName = "Design Time Information";
 
-            var sampleList = new List<ChessPiece>
-                                 {
-                                     new ChessPiece("QR-Blk", 1, 1),
-                                     new ChessPiece("QN-Blk", 1, 2),
-                                     new ChessPiece("QB-Blk", 1, 3),
-                                     new ChessPiece("Q-Blk", 1, 4),
-                                     new ChessPiece("K-Blk", 1, 5),
-                                     new ChessPiece("KB-Blk", 1, 6),
-                                     new ChessPiece("KN-Blk", 1, 7),
-                                     new ChessPiece("KR-Blk", 1, 8),
-                                     new ChessPiece("P1-Blk", 2, 1),
-                                     new ChessPiece("P2-Blk", 2, 2),
-                                     new ChessPiece("P3-Blk", 2, 3),
-                                     new ChessPiece("P4-Blk", 2, 4),
-                                     new ChessPiece("P5-Blk", 2, 5),
-                                     new ChessPiece("P6-Blk", 2, 6),
-                                     new ChessPiece("P7-Blk", 2, 7),
-                                     new ChessPiece("P8-Blk", 2, 8)
-                                 };
+            var bots = new List<SpikeBot> {new SpikeBot(Brushes.Green), new SpikeBot(Brushes.Blue)};
 
-            ChessPieces = new ObservableCollection<ChessPiece>(sampleList);
+            Bots = new ObservableCollection<SpikeBot>(bots);
+        }
+
+        private void OnStartSim()
+        {
+            Action simProcess = ProcessSimulation;
+
+            simProcess.BeginInvoke(null, null);
+        }
+
+        private void ProcessSimulation()
+        {
+            for (var i = 0; i < 1000; i++)
+            {
+                Thread.Sleep(100);
+
+                foreach (var spikeBot in Bots) spikeBot.Move();
+            }
         }
     }
 }
